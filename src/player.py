@@ -2,21 +2,19 @@ import pygame
 
 from typing import Tuple, Dict
 
-class Player(pygame.Rect):
+from src.agent import Agent
+
+class Player(Agent):
 
   """
-  Representa um player (retangulo) do jogo
+  Representa um player no jogo
   """
 
   def __init__(self, initial_position: Tuple[int, int], 
-               controls: Dict[str, int]) -> None:
+               controls: Dict[str, int],
+               speed: float=1.5) -> None:
 
-    left, top = initial_position
-
-    super().__init__(left, top, 15, 100)
-
-    self.y_direction = 0 # Indica a direção em que o jogador está movendo no eixo y (-1 para cima, 0 parado e 1 para baixo)
-    self.speed = 1.5
+    super().__init__(initial_position, speed)
 
     self.controls = controls
   
