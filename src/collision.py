@@ -1,13 +1,13 @@
 from pygame import Surface
 
 from src.ball import Ball
-from src.player import Player
+from src.agent import Agent
 
 from typing import Union
 
 class Collision:
 
-  def __init__(self, obj1: Union[Ball, Player], obj2: Union[Player, Surface]) -> None:
+  def __init__(self, obj1: Union[Ball, Agent], obj2: Union[Agent, Surface]) -> None:
 
     self.obj1 = obj1
     self.obj2 = obj2
@@ -20,7 +20,7 @@ class Collision:
 
     if isinstance(self.obj1, Ball):
 
-      if isinstance(self.obj2, Player):
+      if isinstance(self.obj2, Agent):
           
         if abs(self.obj1.x - self.obj2.x) <= self.obj2.width and self.obj2.y <= self.obj1.y and self.obj2.y + self.obj2.height >= self.obj1.y:
           
@@ -50,7 +50,7 @@ class Collision:
 
         pass
     
-    if isinstance(self.obj1, Player) and isinstance(self.obj2, Surface):
+    if isinstance(self.obj1, Agent) and isinstance(self.obj2, Surface):
        
        if self.obj1.y < 10 or self.obj1.y + self.obj1.height > self.obj2.get_height() - 10:
          
