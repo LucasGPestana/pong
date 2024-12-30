@@ -1,3 +1,4 @@
 {
-  "victory_score": 5
+  "mode":"player_vs_cpu",
+  "victory_score": 2
 }
