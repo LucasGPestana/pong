@@ -1,6 +1,7 @@
 import pygame as pg
 
 from src.player import Player
+from src.cpu import CPU
 from src.ball import Ball
 from src.collision import Collision
 from src.points import Points
@@ -79,11 +80,27 @@ controls_player2 = translateControls(json.load(open(os.path.join(CONFIG_DIR,
 game_config: Dict[str, Any] = json.load(open(os.path.join(CONFIG_DIR,
                                                           "game_config.json"), 'r'))
 VICTORY_SCORE = game_config["victory_score"]
+MODE = game_config["mode"]
 
 position_ball = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
-player1 = Player(position_player1, controls_player1)
-player2 = Player(position_player2, controls_player2)
+agent1 = Player(position_player1, controls_player1)
+
+if MODE == "player_vs_cpu":
+
+    cpu_config: Dict[str, Any] = json.load(open(os.path.join(CONFIG_DIR,
+                                                          "cpu_config.json"), 'r'))
+    CPU_SPEED = cpu_config["speed"]
+
+    agent2 = CPU(position_player2, CPU_SPEED)
+
+elif MODE == "player_vs_player":
+
+    agent2 = Player(position_player2, controls_player2)
+
+else:
+
+    exit("Esse modo de jogo não é válido!")
 
 ball = Ball(position_ball)
 
@@ -113,19 +130,27 @@ while running:
     
     screen.blit(score_text_surface, (score_text_surface_width, score_text_surface_height))
 
-    pg.draw.rect(screen, (255, 255, 255), player1, 15)
-    pg.draw.rect(screen, (255, 255, 255), player2, 15)
+    pg.draw.rect(screen, (255, 255, 255), agent1, 15)
+    pg.draw.rect(screen, (255, 255, 255), agent2, 15)
     pg.draw.rect(screen, (255, 255, 255), ball, 15)
         
-    player1.move(delta_time)
-    player2.move(delta_time)
+    agent1.move(delta_time)
+
+    if isinstance(agent2, Player):
+
+        agent2.move(delta_time)
+    
+    else:
+
+        agent2.move(delta_time, ball.y, ball.y_direction)
+
     ball.move(delta_time)
 
-    Collision(ball, player1).checkCollision()
-    Collision(ball, player2).checkCollision()
+    Collision(ball, agent1).checkCollision()
+    Collision(ball, agent2).checkCollision()
     player_pointed = Collision(ball, screen).checkCollision()
-    Collision(player1, screen).checkCollision()
-    Collision(player2, screen).checkCollision()
+    Collision(agent1, screen).checkCollision()
+    Collision(agent2, screen).checkCollision()
 
     match player_pointed:
     
@@ -149,7 +174,7 @@ while running:
     
     if points.player2_points == VICTORY_SCORE:
 
-        running = buildVictoryScreen("Player 2", running)
+        running = buildVictoryScreen("Player 2" if isinstance(agent2, Player) else "CPU", running)
 
     pg.display.flip()
 
